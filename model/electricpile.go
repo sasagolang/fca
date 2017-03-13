@@ -30,5 +30,8 @@ type ElectricPile struct {
 	IsBook         int
 	Standard       string
 	Seq            int
+	ServiceFee     int
+	ChargeRule     ChargeRule
+	ChargeRuleID   uint
 	//ModelBase
 }

@@ -20,7 +20,5 @@ func (dao BaseDao) GetUserByMobile(mobile string) (user *model.User, err error) 
 	*/return
 }
 func (dao BaseDao) AddUser(user model.User) (err error) {
-	/*	err = MDbMap.Insert(&user)
-		fmt.Printf("errr:%v", err)
-	*/return
+	return
 }

@@ -2,6 +2,7 @@ package http
 
 import (
 	"errors"
+	"fca/libs"
 	"fmt"
 	"net/http"
 	"sort"
@@ -60,6 +61,7 @@ func AliWebCallback(w http.ResponseWriter, r *http.Request) (*common.AliWebPayRe
 func AliAppCallback(w http.ResponseWriter, r *http.Request) (*common.AliWebPayResult, error) {
 	var m = make(map[string]string)
 	var signSlice []string
+	libs.Log.Info(r.URL.String())
 	r.ParseForm()
 	for k, v := range r.Form {
 		m[k] = v[0]

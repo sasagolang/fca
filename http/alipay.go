@@ -23,8 +23,9 @@ func AliAppPay(uid int, paymentAmout int64) string {
 	charge.PayMethod = constant.ALI_APP
 	charge.MoneyFee = order.PaymentAmount
 	charge.Describe = "充值"
-	charge.TradeNum = string(order.OrderNo)
-	charge.CallbackURL = "http://www.aaa.com"
+	charge.TradeNum = strconv.FormatInt(order.OrderNo, 10)
+	charge.CallbackURL = "http://218.17.28.42:8999/callback/aliappcallback"
+	fmt.Printf("tradnum:%v,AliAppPay:%v\n", string(order.OrderNo), charge)
 	fdata, err := logic.Pay(charge)
 	if err != nil {
 		fmt.Printf("AliAppPay:%v\n", err)
@@ -50,7 +51,7 @@ func InitClient() {
 	ali := &client.AliAppClient{
 		PartnerID:  "2088102169368862",
 		SellerID:   "xuyanmei@glelec.com",
-		AppID:      "2016073100136917",
+		AppID:      "2017010804929917",
 		PrivateKey: nil,
 		PublicKey:  nil,
 	}

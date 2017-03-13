@@ -4,6 +4,8 @@ import (
 	"encoding/base64"
 	"fca/dal"
 	htp "fca/http"
+	"fca/libs"
+	"fca/logic"
 	"fmt"
 )
 
@@ -13,13 +15,27 @@ func main() {
 	//dal.GetUserByUID(123)
 	//test()
 	//htp.TestPay()
+	libs.NewLogger()
+
 	dal.InitDb()
-	htp.Logic.RegisterUser("11232323", "", "", "123")
-	order := htp.Logic.CreateOrder(192858680, 200, "aliapp")
-	htp.Logic.DepositFunc(192858680, 100, "dfdfdf", order.OrderNo)
+	//code, _ := htp.Logic.SendMsg("13391126496", "1234")
+	//libs.Log.Info(code)
+	//testData()
+	//	htp.Logic.RegisterUser("11232323", "", "", "123")
+	//order := htp.Logic.CreateOrder(192858680, 200, "aliapp")
+	//	htp.Logic.DepositFunc(192858680, 100, "dfdfdf", order.OrderNo)
+	//htp.Inittcp()
 	htp.InitClient()
+	//htp.InittCPClient()
 	htp.Init()
 
+}
+func testData() {
+	d := new(logic.DeviceProto)
+	content := make([]byte, 100)
+	buff := d.BuildHead(1, "12345", 12, content)
+	d.ParseHead(buff)
+	fmt.Printf("%v\n", *d)
 }
 func test() {
 	var data []byte

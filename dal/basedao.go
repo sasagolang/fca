@@ -1,6 +1,7 @@
 package dal
 
 import (
+	"fca/libs"
 	"fca/model"
 	"fmt"
 	"log"
@@ -17,7 +18,7 @@ type BaseDao struct {
 }
 
 func InitDb() {
-	fmt.Printf("%v\n", "InitDb")
+	libs.Log.Info("InitDb")
 	var err error
 	DB, err = gorm.Open("mysql", fmt.Sprintf("%v:%v@/%v?parseTime=True&loc=Local", "project", "project", "fc"))
 
@@ -34,6 +35,12 @@ func InitDb() {
 	DB.AutoMigrate(&model.Order{})
 	DB.AutoMigrate(&model.MyWallet{}, &model.MyWalletLog{})
 	DB.AutoMigrate(&model.BaseConfig{})
+	DB.AutoMigrate(&model.Feedback{})
+	DB.AutoMigrate(&model.Favorite{})
+	DB.AutoMigrate(&model.ChargeFee{})
+	DB.AutoMigrate(&model.ChargeRule{})
+	DB.AutoMigrate(&model.Reserve{})
+	DB.AutoMigrate(&model.SMSInfo{})
 	//MDbMap = &gorp.DbMap{Db: db, Dialect: gorp.MySQLDialect{"InnoDB", "UTF8"}}
 	//MDbMap.TraceOn("[gorp]", log.New(os.Stdout, "myapp:", log.Lmicroseconds))
 	//MDbMap.AddTableWithName(model.User{}, "Users").SetKeys(true, "UID")

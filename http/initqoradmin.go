@@ -43,4 +43,11 @@ func InitQorAdmin() {
 	if walletlogs != nil {
 	}
 	Admin.AddResource(&model.BaseConfig{})
+	Admin.AddResource(&model.Feedback{})
+	Admin.AddResource(&model.Favorite{})
+	Admin.AddResource(&model.ChargeFee{})
+	//fees.Meta(&admin.Meta{Name: "StartTime", Type: "date"})
+	Admin.AddResource(&model.ChargeRule{})
+	Admin.AddResource(&model.Reserve{})
+	Admin.AddResource(&model.SMSInfo{})
 }

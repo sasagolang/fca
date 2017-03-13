@@ -50,8 +50,16 @@ func Init() {
 		rest.Get("/GetElectricPiles", GetElectricPiles),
 		rest.Post("/CreateElectricPile", CreateElectricPile),
 		rest.Get("/VerifyCode/:keystr/:valuestr", VerifyCode),
-		rest.Get("/GetVerifyImgData/:width/:height", GetVerifyImgData),
+		rest.Get("/SendCode/:mobile", SendCode),
 		rest.Get("/Pay/:PayType/:uid/:Amount", PayFunc),
+		rest.Get("/GetBaseConfig", GetBaseConfigFunc),
+		rest.Get("/GetFeedback/:uid", GetFeedbackFunc),
+		rest.Post("/CreateFeedback", CreateFeedbackFunc),
+		rest.Get("/MyWallet/:uid", MyWalletFunc),
+		rest.Post("/UpdateUserInfo", UpdateUserInfoFunc),
+		rest.Get("/MyFavorite/:uid", MyFavoriteFunc),
+		rest.Get("/AddFavorite/:uid/:ElectricPileID", AddFavoriteFunc),
+		rest.Get("/RemoveFavorite/:uid/:ElectricPileID", RemoveFavoriteFunc),
 	//rest.Delete("/countries/:code", DeleteCountry),
 	)
 	if err != nil {
