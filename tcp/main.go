@@ -9,7 +9,7 @@ import (
 )
 
 var s string = "SwEAAABDAAAAAAABVFMyMDE2MTEyNDAxAAAAAAABCg80NjAyMDE2MDcyNTAwMDMSEDkxMzkyMDE2MDcyNTAwMDO7ZA=="
-
+var Bukets map[string]*Bucket
 func main() {
 	/*
 		b, _ := base64.StdEncoding.DecodeString(s)
@@ -32,6 +32,7 @@ func main() {
 		Inittcp()
 		device.Parse()
 	*/
+	Bukets=make(map[string]*Bucket)
 	addres := make([]string, 0)
 	addres = append(addres, "0.0.0.0:8998")
 	InitTCP(addres, 10)

@@ -11,6 +11,7 @@ type Channel struct {
 	Reader bufio.Reader
 	UUID   string
 	UDType uint16
+	EPName string
 }
 
 func NewChannel(uuid string) *Channel {
