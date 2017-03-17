@@ -8,8 +8,10 @@ import (
 	"fca/logic"
 	"fmt"
 	"net"
+	"strconv"
+	"sync"
 )
-
+var cbLock    sync.RWMutex
 func InitTCP(addrs []string, accept int) (err error) {
 	var (
 		bind     string
@@ -73,7 +75,7 @@ func serveTCP(conn *net.TCPConn, r int) {
 		if err := recover(); err != nil {
 
 			fmt.Println(err) // 这里的err其实就是panic传入的内容，55
-
+			return
 		}
 
 	}()
@@ -91,9 +93,20 @@ func serveTCP(conn *net.TCPConn, r int) {
 	ch.Reader.ResetBuffer(conn, rb.Bytes())
 	ch.Writer.ResetBuffer(conn, wb.Bytes())
 	re := p.ReadTCP(rr)
+	//添加到buket
 	//fmt.Printf("serveTCP:%v\n", re)
 	ch.UUID = re.UDID
 	ch.UDType = re.UDType
+	pole:=Logic.GetPol(ch.UUID)
+	cbLock.Lock()
+	if bucket,ok:=Bukets[strconv.Itoa( int(pole.ElectricPile.ID))];ok{
+		bucket.Put(ch.UUID,ch)
+	}else {
+		Bukets[strconv.Itoa( int(pole.ElectricPile.ID))],_=NewBucket(strconv.Itoa( int(pole.ElectricPile.ID)))
+		bucket=Bukets[strconv.Itoa( int(pole.ElectricPile.ID))]
+		bucket.Put(ch.UUID,ch)
+	}
+	cbLock.Unlock()
 	go dispatchTCP(ch, rr, wr)
 	for {
 		//var p1 = &libs.Proto{}

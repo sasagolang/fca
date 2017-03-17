@@ -50,4 +50,5 @@ func InitQorAdmin() {
 	Admin.AddResource(&model.ChargeRule{})
 	Admin.AddResource(&model.Reserve{})
 	Admin.AddResource(&model.SMSInfo{})
+	Admin.AddResource(&model.Pole{})
 }

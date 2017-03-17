@@ -12,16 +12,7 @@ import (
 func SendMsg(uuid string, p *libs.Proto) {
 
 }
-func Start_cmd(mins int32, time time.Time, ch chan *libs.Proto) {
-	start1 := proto.START{}
-	start1.Mins = protobuf.Int32(30)
-	start1.Time = time2TIME(time)
-	p := &libs.Proto{}
-	p.CMD = 4
-	p.Content, _ = protobuf.Marshal(&start1)
-	ch <- p
 
-}
 func ReceivedMsg(p *libs.Proto, ch chan *libs.Proto) {
 	var data interface{}
 	var err error
@@ -34,7 +25,7 @@ func ReceivedMsg(p *libs.Proto, ch chan *libs.Proto) {
 		HeartBeat(p, ch)
 	case 3: //设备状态数据
 		data, err = Base(p, ch)
-		Start_cmd(1, time.Now().Add(10*time.Minute), ch)
+		//Start_cmd(1, time.Now().Add(10*time.Minute), ch)
 	case 8: // 设备属性配置数据
 		data, err = Confi_up(p, ch)
 	case 9: // 充电中实时数据
@@ -69,30 +60,72 @@ func TIME2Time(t proto.TIME) time.Time {
 }
 func Upgrade_down(p *libs.Proto, ch chan *libs.Proto) (pb proto.UPGRADE_DOWN, err error) {
 	err = protobuf.Unmarshal(p.Content, &pb)
+	po := &libs.Proto{}
+	po.CMD = 13
+	po.Content = make([]byte, 0)
+	po.UDID = p.UDID
+
+	ch <- po
 	return
 }
 func Trade(p *libs.Proto, ch chan *libs.Proto) (pb proto.TRADE, err error) {
 	err = protobuf.Unmarshal(p.Content, &pb)
+	po := &libs.Proto{}
+	po.CMD = 12
+	po.Content = make([]byte, 0)
+	po.UDID = p.UDID
+
+	ch <- po
 	return
 }
 func Meter(p *libs.Proto, ch chan *libs.Proto) (pb proto.METER, err error) {
 	err = protobuf.Unmarshal(p.Content, &pb)
+	po := &libs.Proto{}
+	po.CMD = 11
+	po.Content = make([]byte, 0)
+	po.UDID = p.UDID
+
+	ch <- po
 	return
 }
 func Alarm(p *libs.Proto, ch chan *libs.Proto) (pb proto.ALARM, err error) {
 	err = protobuf.Unmarshal(p.Content, &pb)
+	po := &libs.Proto{}
+	po.CMD = 10
+	po.Content = make([]byte, 0)
+	po.UDID = p.UDID
+
+	ch <- po
 	return
 }
 func Base(p *libs.Proto, ch chan *libs.Proto) (pb proto.BASE, err error) {
 	err = protobuf.Unmarshal(p.Content, &pb)
+	po := &libs.Proto{}
+	po.CMD = 3
+	po.Content = make([]byte, 0)
+	po.UDID = p.UDID
+
+	ch <- po
 	return
 }
 func Confi_up(p *libs.Proto, ch chan *libs.Proto) (pb proto.CONFIG, err error) {
 	err = protobuf.Unmarshal(p.Content, &pb)
+	po := &libs.Proto{}
+	po.CMD = 8
+	po.Content = make([]byte, 0)
+	po.UDID = p.UDID
+
+	ch <- po
 	return
 }
 func Charge(p *libs.Proto, ch chan *libs.Proto) (pb proto.CHARGE, err error) {
 	err = protobuf.Unmarshal(p.Content, &pb)
+	po := &libs.Proto{}
+	po.CMD = 9
+	po.Content = make([]byte, 0)
+	po.UDID = p.UDID
+
+	ch <- po
 	return
 }
 func HeartBeat(p *libs.Proto, ch chan *libs.Proto) {

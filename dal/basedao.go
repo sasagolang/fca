@@ -41,7 +41,7 @@ func InitDb() {
 	DB.AutoMigrate(&model.ChargeRule{})
 	DB.AutoMigrate(&model.Reserve{})
 	DB.AutoMigrate(&model.SMSInfo{})
-	DB.AutoMigrate(&model.)
+	DB.AutoMigrate(&model.Pole{})
 	//MDbMap = &gorp.DbMap{Db: db, Dialect: gorp.MySQLDialect{"InnoDB", "UTF8"}}
 	//MDbMap.TraceOn("[gorp]", log.New(os.Stdout, "myapp:", log.Lmicroseconds))
 	//MDbMap.AddTableWithName(model.User{}, "Users").SetKeys(true, "UID")

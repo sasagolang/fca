@@ -10,7 +10,10 @@ import (
 
 var s string = "SwEAAABDAAAAAAABVFMyMDE2MTEyNDAxAAAAAAABCg80NjAyMDE2MDcyNTAwMDMSEDkxMzkyMDE2MDcyNTAwMDO7ZA=="
 var Bukets map[string]*Bucket
+var Logic logic.LogicBase
 func main() {
+	Logic = logic.LogicBase{}
+	logic.InitLogic()
 	/*
 		b, _ := base64.StdEncoding.DecodeString(s)
 		device := &logic.DeviceProto{}
