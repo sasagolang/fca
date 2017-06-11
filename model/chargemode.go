@@ -18,4 +18,5 @@ type ChargeRule struct {
 	gorm.Model
 	Name       string
 	ChargeFees []ChargeFee `gorm:"many2many:rule_fees;"`
+	CarFee     int
 }

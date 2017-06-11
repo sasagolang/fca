@@ -4,10 +4,14 @@ import "github.com/jinzhu/gorm"
 
 type Pole struct {
 	gorm.Model
-	ElectricPile ElectricPile
+	ElectricPile   ElectricPile
 	ElectricPileID uint
-	UUID string
-	Imei string
-	Imsi string
-	Status int
+	UUID           string
+	Imei           string
+	Imsi           string
+	NO             int
+	Status         int
+	Amount         float32
+	Duration       int
+	State          string
 }

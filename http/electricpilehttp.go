@@ -43,8 +43,13 @@ func GetElectricPiles(w rest.ResponseWriter, r *rest.Request) {
 	mylat, _ := strconv.ParseFloat(r.Request.FormValue("mylat"), 64)
 	mylng, _ := strconv.ParseFloat(r.Request.FormValue("mylng"), 64)
 	distinct, _ := strconv.ParseFloat(r.Request.FormValue("distinct"), 64)
+	epTypeIDstr := r.Request.FormValue("epTypeID")
+	epTypeID := 0
+	if epTypeIDstr != "" {
+		epTypeID, _ = strconv.Atoi(epTypeIDstr)
+	}
 	//fmt.Printf("searchkey:%v", searchkey)
-	eps, err := Logic.GetElectricPiles(searchkey, mylat, mylng, distinct)
+	eps, err := Logic.GetElectricPiles(searchkey, mylat, mylng, distinct, epTypeID)
 	if err != nil {
 		fmt.Printf("GetElectricPiles error(%v)\n", err)
 		WriterResponse(w, 2, err.Error(), err)

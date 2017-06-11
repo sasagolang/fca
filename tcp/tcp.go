@@ -3,15 +3,16 @@ package main
 import (
 	"fca/libs"
 	"fca/libs/bufio"
+	"strconv"
 
 	"fca/libs/bytes"
-	"fca/logic"
 	"fmt"
 	"net"
-	"strconv"
 	"sync"
 )
-var cbLock    sync.RWMutex
+
+var cbLock sync.RWMutex
+
 func InitTCP(addrs []string, accept int) (err error) {
 	var (
 		bind     string
@@ -79,6 +80,7 @@ func serveTCP(conn *net.TCPConn, r int) {
 		}
 
 	}()
+
 	var ch = NewChannel("")
 	ch.Reader = bufio.Reader{}
 	ch.Writer = bufio.Writer{}
@@ -96,9 +98,13 @@ func serveTCP(conn *net.TCPConn, r int) {
 	//添加到buket
 	//fmt.Printf("serveTCP:%v\n", re)
 	ch.UUID = re.UDID
+	//ch.UUID = strings.Replace(ch.UUID, string([]byte{0}), "", -1)
+	//ch.UUID = strings.Replace(ch.UUID, "\n", "", -1)
 	ch.UDType = re.UDType
-	pole:=Logic.GetPol(ch.UUID)
-	cbLock.Lock()
+	fmt.Printf("链接:%v\n", ch.UUID)
+	pole := Logic.GetPole(ch.UUID)
+	ch.EPName = strconv.Itoa(int(pole.ElectricPile.ID))
+	/*cbLock.Lock()
 	if bucket,ok:=Bukets[strconv.Itoa( int(pole.ElectricPile.ID))];ok{
 		bucket.Put(ch.UUID,ch)
 	}else {
@@ -106,12 +112,13 @@ func serveTCP(conn *net.TCPConn, r int) {
 		bucket=Bukets[strconv.Itoa( int(pole.ElectricPile.ID))]
 		bucket.Put(ch.UUID,ch)
 	}
-	cbLock.Unlock()
+	cbLock.Unlock()*/
+	InBucket(ch)
 	go dispatchTCP(ch, rr, wr)
 	for {
 		//var p1 = &libs.Proto{}
 		p1 := p.ReadTCP(rr)
-		logic.ReceivedMsg(p1, ch.signal)
+		Logic.ReceivedMsg(p1, ch.signal)
 		//	fmt.Printf("serveTCP:%v\n", p1)
 	}
 }
@@ -121,7 +128,7 @@ func dispatchTCP(ch *Channel, rr *bufio.Reader, wr *bufio.Writer) {
 		p := <-ch.signal
 		p.UDID = ch.UUID
 		p.UDType = ch.UDType
-		fmt.Printf("dispatchTCP:%v\n", p)
+		//	fmt.Printf("dispatchTCP:%v\n", p)
 		p.WriteTo(wr)
 		wr.Flush()
 	}

@@ -51,4 +51,8 @@ func InitQorAdmin() {
 	Admin.AddResource(&model.Reserve{})
 	Admin.AddResource(&model.SMSInfo{})
 	Admin.AddResource(&model.Pole{})
+	Admin.AddResource(&model.Comment{})
+	Admin.AddResource(&model.ChargeOrder{})
+	Admin.AddResource(&model.Message{})
+	//Admin.SetAuth(&Auth{})
 }

@@ -18,7 +18,7 @@ func APIinit() {
 	APIMap["GetCarBrands"] = model.API{Name: "GetCarBrands", URL: "/GetCarBrands", Request: nil, Response: []model.CarBrandResponse{}}
 	APIMap["GetQuestions"] = model.API{Name: "GetQuestions", URL: "/GetQuestions", Request: nil, Response: []model.QuestionResponse{}}
 	APIMap["GetElectricPile"] = model.API{Name: "GetElectricPile", URL: "/GetElectricPile/{id}", Request: nil, Response: model.ElectricPile{}}
-	APIMap["GetElectricPiles"] = model.API{Name: "GetElectricPiles", URL: "/GetElectricPiles?searchkey=上海&mylat=1.0123&mylng=2&distinct=100000", Request: nil, Response: []model.ElectricPile{}}
+	APIMap["GetElectricPiles"] = model.API{Name: "GetElectricPiles", URL: "/GetElectricPiles?searchkey=上海&mylat=1.0123&mylng=2&distinct=100000&epTypeID=1", Request: nil, Response: []model.ElectricPile{}}
 	APIMap["GetElectricPileByNo"] = model.API{Name: "GetElectricPileByNo", URL: "/GetElectricPileByNo/{No}", Request: nil, Response: model.ElectricPile{}}
 	APIMap["SendCode"] = model.API{Name: "SendCode", URL: "/SendCode/:mobile", Request: nil, Response: model.VerrifyImg{}}
 
@@ -34,7 +34,20 @@ func APIinit() {
 	APIMap["MyFavorite"] = model.API{Name: "MyFavorite", URL: "/MyFavorite/:uid", Request: nil, Response: model.Favorite{}}
 	APIMap["AddFavorite"] = model.API{Name: "AddFavorite", URL: "/AddFavorite/:uid/:ElectricPileID", Request: nil, Response: nil}
 	APIMap["RemoveFavorite"] = model.API{Name: "RemoveFavorite", URL: "/RemoveFavorite/:uid/:ElectricPileID", Request: nil, Response: nil}
+	APIMap["CreateReserve"] = model.API{Name: "CreateReserve", URL: "/CreateReserve/:uid", Request: model.CreateReserveRequest{}, Response: nil}
+	APIMap["GetMyReserve"] = model.API{Name: "GetMyReserve", URL: "/GetMyReserve/:uid", Request: nil, Response: []model.MyReserveResponse{}}
+	APIMap["CreateComment"] = model.API{Name: "CreateComment", URL: "/CreateComment/:uid", Request: model.CreateCommentRequest{}, Response: nil}
+	APIMap["GetComments"] = model.API{Name: "GetComments", URL: "/GetComments/:epid", Request: nil, Response: []model.GetCommentResponse{}}
+	APIMap["GetLastCharge"] = model.API{Name: "GetLastCharge", URL: "/GetLastCharge/:uid/", Request: nil, Response: model.ChargeOrder{}}
+	APIMap["GetMyMessages"] = model.API{Name: "GetMyMessages", URL: "/GetMyMessages/:uid", Request: nil, Response: []model.Message{}}
+	APIMap["SetMessageRead"] = model.API{Name: "SetMessageRead", URL: "/SetMessageRead/:uid/:msgid", Request: nil, Response: nil}
+	APIMap["StartCharge"] = model.API{Name: "StartCharge", URL: "/StartCharge/:uid/:no/:mins", Request: nil, Response: nil}
+	APIMap["EndCharge"] = model.API{Name: "EndCharge", URL: "/EndCharge/:uid/:no", Request: nil, Response: nil}
+	APIMap["StartLight"] = model.API{Name: "StartLight", URL: "/StartLight/:uid/:no", Request: nil, Response: nil}
 
+	APIMap["EndLight"] = model.API{Name: "EndLight", URL: "/EndLight/:uid/:no", Request: nil, Response: nil}
+	APIMap["GetChargeStatus"] = model.API{Name: "GetChargeStatus", URL: "/GetChargeStatus/:uid/:orderno", Request: nil, Response: model.ChargeOrder{}}
+	APIMap["GetMyCharges"] = model.API{Name: "GetMyCharges", URL: "/GetMyCharges/:uid/", Request: nil, Response: []model.ChargeOrder{}}
 }
 
 func GetAPIs(w rest.ResponseWriter, r *rest.Request) {

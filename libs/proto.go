@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"fca/libs/bufio"
 	"fmt"
+	"strings"
 	"time"
 )
 
@@ -40,7 +41,9 @@ func (p *Proto) ReadTCP(rr *bufio.Reader) (re *Proto) {
 	re.UDType = binary.BigEndian.Uint16(buf[10:12])
 	//binary.Read(rr, binary.BigEndian, p.TimeStamp)
 	//binary.Read(rr, binary.BigEndian, p.UDType)
+	//fmt.Printf("re.UDID:%v\n", buf[12:28])
 	re.UDID = string(buf[12:28])
+	re.UDID = strings.Replace(re.UDID, string([]byte{0}), "", -1)
 	re.CMD = binary.BigEndian.Uint16(buf[28:30])
 	//udidb := [16]byte{}
 	//binary.Read(rr, binary.BigEndian, udidb)
@@ -76,7 +79,7 @@ func (p *Proto) WriteTo(b *bufio.Writer) {
 	pl := len(p.Content) + RawHeaderSize
 
 	binary.Write(b1, binary.BigEndian, int32(pl))
-	binary.Write(b1, binary.BigEndian, int32(time.Now().Nanosecond()))
+	binary.Write(b1, binary.BigEndian, int32(time.Now().Unix()))
 
 	binary.Write(b1, binary.BigEndian, p.UDType)
 	imei := p.UDID
@@ -90,8 +93,8 @@ func (p *Proto) WriteTo(b *bufio.Writer) {
 	crc := Crc16(b1.Bytes())
 	binary.Write(b1, binary.BigEndian, crc)
 	_, err := b.Write(b1.Bytes())
-	fmt.Printf("WriteTo:%v\n", b1.Bytes())
+	fmt.Printf("WriteTo:%v\n", *p)
 	if err != nil {
-		panic(err)
+		fmt.Printf("WriteTo.error:%v\n", err)
 	}
 }

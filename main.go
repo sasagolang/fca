@@ -7,16 +7,20 @@ import (
 	"fca/libs"
 	"fca/logic"
 	"fmt"
+	"time"
 )
 
 func main() {
+	fmt.Println(int32(time.Now().Unix()))
+	//s= strings.Replace(s, " ", "", -1)
+	//s= strings.Replace(s, "\n", "", -1)
 	//fmt.Println("fffdf")
 	//Dao.GetUserByUID(123)
 	//dal.GetUserByUID(123)
 	//test()
 	//htp.TestPay()
 	libs.NewLogger()
-
+	htp.DeviceUrl = "http://127.0.0.1:8997"
 	dal.InitDb()
 	//code, _ := htp.Logic.SendMsg("13391126496", "1234")
 	//libs.Log.Info(code)

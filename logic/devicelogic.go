@@ -6,21 +6,19 @@ import (
 	"fmt"
 	"time"
 
+	"strconv"
+
 	protobuf "github.com/golang/protobuf/proto"
 )
 
-func SendMsg(uuid string, p *libs.Proto) {
-
-}
-
-func ReceivedMsg(p *libs.Proto, ch chan *libs.Proto) {
+func (logic LogicBase) ReceivedMsg(p *libs.Proto, ch chan *libs.Proto) {
 	var data interface{}
 	var err error
 	//fmt.Printf("ReceivedMsg:%v\n", p)
 	switch p.CMD {
 	case 1: //上行握手
 		data, err = Handshake_up(p, ch)
-		fmt.Printf("ReceivedMsg:CMD:%v,err:%v,data:%v\n", p.CMD, err, data.(proto.HANDSHAKE_UP))
+	//	fmt.Printf("ReceivedMsg:CMD:%v,err:%v,data:%v\n", p.CMD, err, data.(proto.HANDSHAKE_UP))
 	case 2: //心跳
 		HeartBeat(p, ch)
 	case 3: //设备状态数据
@@ -30,6 +28,9 @@ func ReceivedMsg(p *libs.Proto, ch chan *libs.Proto) {
 		data, err = Confi_up(p, ch)
 	case 9: // 充电中实时数据
 		data, err = Charge(p, ch)
+		v := data.(proto.CHARGE)
+		fmt.Printf("proto.CHARGE:%v\n", v)
+		logic.UpdateCharge(p.UDID, strconv.Itoa(int(*v.State)), *v.Energy, *v.Amount, *v.Duration)
 	case 10: //设备告警数据
 		data, err = Alarm(p, ch)
 	case 11: //电表实时数据
@@ -40,7 +41,9 @@ func ReceivedMsg(p *libs.Proto, ch chan *libs.Proto) {
 		data, err = Upgrade_down(p, ch)
 
 	}
-	fmt.Printf("ReceivedMsg:CMD:%v,err:%v,data:%v\n", p.CMD, err, &data)
+	if err != nil {
+		fmt.Printf("ReceivedMsg:CMD:%v,err:%v,data:%v\n", p.CMD, err, &data)
+	}
 
 }
 func time2TIME(time time.Time) *proto.TIME {
@@ -70,6 +73,7 @@ func Upgrade_down(p *libs.Proto, ch chan *libs.Proto) (pb proto.UPGRADE_DOWN, er
 }
 func Trade(p *libs.Proto, ch chan *libs.Proto) (pb proto.TRADE, err error) {
 	err = protobuf.Unmarshal(p.Content, &pb)
+	fmt.Printf("Trade:%v\n", &pb)
 	po := &libs.Proto{}
 	po.CMD = 12
 	po.Content = make([]byte, 0)
@@ -100,6 +104,7 @@ func Alarm(p *libs.Proto, ch chan *libs.Proto) (pb proto.ALARM, err error) {
 }
 func Base(p *libs.Proto, ch chan *libs.Proto) (pb proto.BASE, err error) {
 	err = protobuf.Unmarshal(p.Content, &pb)
+	fmt.Printf("Base:%v\n", &pb)
 	po := &libs.Proto{}
 	po.CMD = 3
 	po.Content = make([]byte, 0)
@@ -111,11 +116,12 @@ func Base(p *libs.Proto, ch chan *libs.Proto) (pb proto.BASE, err error) {
 func Confi_up(p *libs.Proto, ch chan *libs.Proto) (pb proto.CONFIG, err error) {
 	err = protobuf.Unmarshal(p.Content, &pb)
 	po := &libs.Proto{}
+	fmt.Printf("Confi_up:%v\n", &pb)
 	po.CMD = 8
 	po.Content = make([]byte, 0)
 	po.UDID = p.UDID
 
-	ch <- po
+	//ch <- po
 	return
 }
 func Charge(p *libs.Proto, ch chan *libs.Proto) (pb proto.CHARGE, err error) {
@@ -141,7 +147,7 @@ func Handshake_up(p *libs.Proto, ch chan *libs.Proto) (pb proto.HANDSHAKE_UP, er
 	err = protobuf.Unmarshal(p.Content, &pb)
 	//发送下行握手
 	s := proto.HANDSHAKE_DOWN{}
-	s.Ip = protobuf.String("192.168.1.146")
+	s.Ip = protobuf.String("119.23.22.219")
 	s.Port = protobuf.Int32(8998)
 	s.Time = time2TIME(time.Now())
 	b, er := protobuf.Marshal(&s)

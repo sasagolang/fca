@@ -2,6 +2,8 @@ package main
 
 import (
 	"encoding/base64"
+	"fca/dal"
+	"fca/libs"
 	"fca/logic"
 	"fmt"
 	"net"
@@ -11,9 +13,13 @@ import (
 var s string = "SwEAAABDAAAAAAABVFMyMDE2MTEyNDAxAAAAAAABCg80NjAyMDE2MDcyNTAwMDMSEDkxMzkyMDE2MDcyNTAwMDO7ZA=="
 var Bukets map[string]*Bucket
 var Logic logic.LogicBase
+
 func main() {
+	libs.NewLogger()
 	Logic = logic.LogicBase{}
+	dal.InitDb()
 	logic.InitLogic()
+	go InitHttp()
 	/*
 		b, _ := base64.StdEncoding.DecodeString(s)
 		device := &logic.DeviceProto{}
@@ -35,7 +41,7 @@ func main() {
 		Inittcp()
 		device.Parse()
 	*/
-	Bukets=make(map[string]*Bucket)
+	Bukets = make(map[string]*Bucket)
 	addres := make([]string, 0)
 	addres = append(addres, "0.0.0.0:8998")
 	InitTCP(addres, 10)
@@ -67,12 +73,13 @@ func Server(listen *net.TCPListener) {
 	for {
 		conn, err := listen.AcceptTCP()
 		if err != nil {
+			panic(err)
 			fmt.Println("接受客户端连接异常:", err.Error())
 			continue
 		}
 		fmt.Println("客户端连接来自:", conn.RemoteAddr().String())
 		down := logic.DeviceProto{}
-		bytes, _ := down.Handshake_down(8998, "192.168.1.146", time.Now())
+		bytes, _ := down.Handshake_down(8998, "119.23.22.219", time.Now())
 
 		go func() {
 			device := logic.DeviceProto{}

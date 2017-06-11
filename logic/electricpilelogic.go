@@ -38,13 +38,13 @@ func (logic LogicBase) GetElectricPileByID(id int) (ep *model.ElectricPile, err 
 }
 func (logic LogicBase) GetElectricPileByNo(no string) (ep *model.ElectricPile, err error) {
 	var eptmp model.ElectricPile
-	if dal.DB.Preload("EPDirectType").Preload("EPType").Where("No=?", no).First(&eptmp).RecordNotFound() {
+	if dal.DB.Preload("EPDirectType").Preload("ChargeRule").Preload("ChargeRule.ChargeFees").Preload("EPType").Where("No=?", no).First(&eptmp).RecordNotFound() {
 		return nil, errors.New("未查找到")
 	}
 
 	return &eptmp, nil
 }
-func (logic LogicBase) GetElectricPiles(searchkey string, mylat float64, mylng float64, distinct float64) (eps []model.ElectricPile, err error) {
+func (logic LogicBase) GetElectricPiles(searchkey string, mylat float64, mylng float64, distinct float64, epTypeID int) (eps []model.ElectricPile, err error) {
 	var elpstmp []model.ElectricPile
 	if mylat != 0 && mylng != 0 && distinct != 0 {
 
@@ -56,9 +56,14 @@ func (logic LogicBase) GetElectricPiles(searchkey string, mylat float64, mylng f
 		minLat := mylat - ranges
 		maxLng := mylng + lngR
 		minLng := mylng - lngR
+		if epTypeID > 0 {
+			dal.DB.Preload("EPDirectType").Preload("EPType").Where("Name like ? And ((latitude BETWEEN ? AND ?) AND (longitude BETWEEN ? AND ?)) AND EPTypeID=?", "%"+searchkey+"%", minLat, maxLat, minLng, maxLng, epTypeID).Find(&elpstmp)
 
+		} else {
+			dal.DB.Preload("EPDirectType").Preload("EPType").Where("Name like ? And ((latitude BETWEEN ? AND ?) AND (longitude BETWEEN ? AND ?)) ", "%"+searchkey+"%", minLat, maxLat, minLng, maxLng).Find(&elpstmp)
+
+		}
 		//SELECT * FROM checkinTable WHERE ((lat BETWEEN ? AND ?) AND (lng BETWEEN ? AND ?))
-		dal.DB.Preload("EPDirectType").Preload("EPType").Where("Name like ? And ((latitude BETWEEN ? AND ?) AND (longitude BETWEEN ? AND ?)) ", "%"+searchkey+"%", minLat, maxLat, minLng, maxLng).Find(&elpstmp)
 
 	} else {
 		dal.DB.Preload("EPDirectType").Preload("EPType").Where("Name like ?  ", "%"+searchkey+"%").Find(&elpstmp)

@@ -1,13 +1,15 @@
 package main
 
 import "sync"
+import "fmt"
 
 type Bucket struct {
-	cLock    sync.RWMutex
-	name string
-	chs map[string] *Channel
+	cLock sync.RWMutex
+	name  string
+	chs   map[string]*Channel
 }
-func NewBucket(name string ) (b *Bucket,err error) {
+
+func NewBucket(name string) (b *Bucket, err error) {
 	b = &Bucket{}
 	b.name = name
 	b.chs = make(map[string]*Channel)
@@ -16,20 +18,22 @@ func NewBucket(name string ) (b *Bucket,err error) {
 func (b *Bucket) Put(key string, ch *Channel) (err error) {
 	b.cLock.Lock()
 	defer b.cLock.Unlock()
-	if _,ok:=b.chs[key];!ok {
+	/*if _, ok := b.chs[key]; !ok {
 		b.chs[key] = ch
-	}
+	}*/
+	b.chs[key] = ch
 	return
 }
-func (b *Bucket) Del(key string)(err error){
+func (b *Bucket) Del(key string) (err error) {
 	b.cLock.Lock()
-	defer  b.cLock.Unlock()
-	if _,ok:=b.chs[key];ok{
-		delete(b.chs,key)
+	defer b.cLock.Unlock()
+	if _, ok := b.chs[key]; ok {
+		delete(b.chs, key)
 	}
 	return
 }
-func (b *Bucket) Channel(key string)(ch *Channel){
-	ch=b.chs[key]
+func (b *Bucket) Channel(key string) (ch *Channel) {
+	fmt.Printf("Channel:%v\n", &b)
+	ch = b.chs[key]
 	return
 }

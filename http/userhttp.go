@@ -84,7 +84,10 @@ func RegisterByMobile(w rest.ResponseWriter, r *rest.Request) {
 		WriterResponse(w, 2, err.Error(), err)
 		return
 	}
-	WriterResponse(w, 1, "", u)
+	res := model.UserLoginResponse{}
+	res.Token = strconv.FormatInt(time.Now().UnixNano(), 10)
+	res.User = *u
+	WriterResponse(w, 1, "", res)
 }
 func UpdateUserInfoFunc(w rest.ResponseWriter, r *rest.Request) {
 
@@ -101,7 +104,7 @@ func UpdateUserInfoFunc(w rest.ResponseWriter, r *rest.Request) {
 		if err3 != nil {
 			panic(err3)
 		}
-		err2 := ioutil.WriteFile(getCurrentPath()+filename, ddd, 0666) //buffer输出到jpg文件中（不做处理，直接写到文件）
+		err2 := ioutil.WriteFile(GetCurrentPath()+filename, ddd, 0666) //buffer输出到jpg文件中（不做处理，直接写到文件）
 		if err2 != nil {
 			//panic(err2)
 			fmt.Printf("UpdateUserInfoFunc:%v\n", err2)

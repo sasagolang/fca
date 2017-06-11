@@ -60,6 +60,21 @@ func Init() {
 		rest.Get("/MyFavorite/:uid", MyFavoriteFunc),
 		rest.Get("/AddFavorite/:uid/:ElectricPileID", AddFavoriteFunc),
 		rest.Get("/RemoveFavorite/:uid/:ElectricPileID", RemoveFavoriteFunc),
+		rest.Get("/StartCharge/:uid/:no/:mins", StartChargeFunc),
+		rest.Get("/EndCharge/:uid/:no", EndChargeFunc),
+		rest.Get("/StartLight/:uid/:no", StartLightFunc),
+		rest.Get("/EndLight/:uid/:no", EndLightFunc),
+		rest.Get("/GetChargeStatus/:uid/:orderno", GetChargeStatusFunc),
+		rest.Get("/GetMyCharges/:uid", GetMyChargesFunc),
+		rest.Get("/GetLastCharge/:uid", GetLastChargeFunc),
+		//预约
+		rest.Post("/CreateReserve/:uid", CreateReserveFunc),
+		rest.Get("/GetMyReserve/:uid", GetMyReserveFunc),
+		//评论
+		rest.Post("/CreateComment/:uid", CreateCommentFunc),
+		rest.Get("/GetComments/:epid", GetCommentsFunc),
+		rest.Get("/GetMyMessages/:uid", GetMyMessagesFunc),
+		rest.Get("/SetMessageRead/:uid/:msgid", SetMessageReadFunc),
 	//rest.Delete("/countries/:code", DeleteCountry),
 	)
 	if err != nil {
@@ -79,7 +94,11 @@ func Init() {
 		}
 		selfHandler(aliResult)
 	})
-	log.Fatal(http.ListenAndServe(":8999", nil))
+	InitAuth()
+	//go log.Fatal(http.ListenAndServe(":8999", nil))
+	err1 := http.ListenAndServeTLS(":443", "214079740930545.pem", "214079740930545.key", nil)
+	fmt.Printf("err1:%v\n", err1)
+
 	/*	router := httprouter.New()
 		router.GET("/", Index)
 		router.GET("/hello/:name", Hello)

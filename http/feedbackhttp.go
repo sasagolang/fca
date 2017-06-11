@@ -24,7 +24,7 @@ func GetFeedbackFunc(w rest.ResponseWriter, r *rest.Request) {
 	}
 	WriterResponse(w, 1, "", fbs)
 }
-func getCurrentPath() string {
+func GetCurrentPath() string {
 	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	fmt.Printf("getCurrentPath:%v\n", dir)
 	if err != nil {
@@ -50,7 +50,7 @@ func CreateFeedbackFunc(w rest.ResponseWriter, r *rest.Request) {
 			panic(err3)
 		}
 		//fmt.Printf("CreateFeedbackFunc.ddd:%v\n", ddd)
-		err2 := ioutil.WriteFile(getCurrentPath()+filename, ddd, 0666) //buffer输出到jpg文件中（不做处理，直接写到文件）
+		err2 := ioutil.WriteFile(GetCurrentPath()+filename, ddd, 0666) //buffer输出到jpg文件中（不做处理，直接写到文件）
 		//err2 := ioutil.WriteFile(filename, ddd, 0666) //buffer输出到jpg文件中（不做处理，直接写到文件）
 		if err2 != nil {
 			//panic(err2)
