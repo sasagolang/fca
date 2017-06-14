@@ -23,6 +23,36 @@ func (logic LogicBase) ReceivedMsg(p *libs.Proto, ch chan *libs.Proto) {
 		HeartBeat(p, ch)
 	case 3: //设备状态数据
 		data, err = Base(p, ch)
+		if err == nil {
+			v := data.(proto.BASE)
+			//更新电桩信息
+			var statusname string
+			switch v.GetMode() {
+			case 0:
+				statusname = "异常"
+
+			case 1:
+				statusname = "空闲"
+
+			case 2:
+				statusname = "充电中"
+
+			case 3:
+				statusname = "固件升级中"
+
+			case 4:
+				statusname = "充电枪已连接"
+
+			case 5:
+				statusname = "充满"
+
+			case 6:
+				statusname = "充电结束"
+			default:
+				statusname = "未知"
+			}
+			logic.UpdatePoleStatus(p.UDID, int32(v.GetMode()*2000), statusname)
+		}
 		//Start_cmd(1, time.Now().Add(10*time.Minute), ch)
 	case 8: // 设备属性配置数据
 		data, err = Confi_up(p, ch)
@@ -104,7 +134,7 @@ func Alarm(p *libs.Proto, ch chan *libs.Proto) (pb proto.ALARM, err error) {
 }
 func Base(p *libs.Proto, ch chan *libs.Proto) (pb proto.BASE, err error) {
 	err = protobuf.Unmarshal(p.Content, &pb)
-	fmt.Printf("Base:%v\n", &pb)
+
 	po := &libs.Proto{}
 	po.CMD = 3
 	po.Content = make([]byte, 0)

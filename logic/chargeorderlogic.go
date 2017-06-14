@@ -4,6 +4,8 @@ import (
 	"fca/dal"
 	"fca/model"
 	"time"
+
+	"github.com/jinzhu/gorm"
 )
 
 func (logic LogicBase) CreateChargeOrder(uid int, no int, uuid, epname, epaddres string) *model.ChargeOrder {
@@ -40,4 +42,25 @@ func (logic LogicBase) GetMyChargeOrders(uid int) *[]model.ChargeOrder {
 	var charges []model.ChargeOrder
 	dal.DB.Where("UID = ? ", uid).Find(&charges)
 	return &charges
+}
+func (logic LogicBase) GetKFOrders() *[]model.ChargeOrder {
+	var charges []model.ChargeOrder
+	dal.DB.Where("Status=? ", 1).Find(&charges)
+	return &charges
+}
+func (logic LogicBase) KF() {
+	orders := logic.GetKFOrders()
+	if orders != nil {
+		for _, v := range *orders {
+			tx := dal.DB.Begin()
+			var myWallet model.MyWallet
+			var order model.ChargeOrder
+			if !dal.DB.Where("uid=?", v.UID).First(&myWallet).RecordNotFound() {
+				dal.DB.Model(&myWallet).Update("Balance", gorm.Expr("Balance - ?", v.Amount))
+				dal.DB.Model(&order).Where("ID = ?", v.ID).Updates(map[string]interface{}{"Status": 3, "StatusName": "扣款完成"})
+			}
+
+			tx.Commit()
+		}
+	}
 }

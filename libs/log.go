@@ -6,9 +6,9 @@ import (
 	"strings"
 	"time"
 
-	log "github.com/Sirupsen/logrus"
 	"github.com/lestrrat/go-file-rotatelogs"
 	"github.com/rifflock/lfshook"
+	log "github.com/sirupsen/logrus"
 )
 
 var Log *log.Logger

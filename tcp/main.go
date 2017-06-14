@@ -14,11 +14,18 @@ var s string = "SwEAAABDAAAAAAABVFMyMDE2MTEyNDAxAAAAAAABCg80NjAyMDE2MDcyNTAwMDMS
 var Bukets map[string]*Bucket
 var Logic logic.LogicBase
 
+func KFRoutine() {
+	for {
+		Logic.KF()
+		time.Sleep(1 * time.Second)
+	}
+}
 func main() {
 	libs.NewLogger()
 	Logic = logic.LogicBase{}
 	dal.InitDb()
 	logic.InitLogic()
+	go KFRoutine()
 	go InitHttp()
 	/*
 		b, _ := base64.StdEncoding.DecodeString(s)

@@ -11,6 +11,7 @@ type Pole struct {
 	Imsi           string
 	NO             int
 	Status         int
+	StatusName     string
 	Amount         float32
 	Duration       int
 	State          string

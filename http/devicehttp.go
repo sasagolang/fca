@@ -19,7 +19,17 @@ func StartChargeFunc(w rest.ResponseWriter, r *rest.Request) {
 	no, _ := strconv.Atoi(r.PathParam("no"))
 	mins, _ := strconv.Atoi(r.PathParam("mins"))
 	pole := Logic.GetPoleByNo(no)
+	wallet, _ := Logic.MyWallet(uid)
 	if pole != nil {
+		if wallet.Balance <= 0 {
+			WriterResponse(w, 5, "余额不足，请先充值!", nil)
+			return
+		}
+		if pole.Status != 2004 {
+			WriterResponse(w, 4, "请连接充电枪后开始充电！", nil)
+			return
+		}
+
 		response, err := http.Get(fmt.Sprintf("%s/start/%s/%d", DeviceUrl, pole.UUID, mins))
 		fmt.Printf(fmt.Sprintf("err:%v\n", err))
 		if response != nil {
