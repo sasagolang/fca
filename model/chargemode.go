@@ -8,10 +8,11 @@ import (
 
 type ChargeFee struct {
 	gorm.Model
-	Name      string
-	StartTime time.Time
-	EndTime   time.Time
-	Price     int
+	Name       string
+	StartTime  time.Time
+	EndTime    time.Time
+	ChargeTime string
+	Price      int
 }
 
 type ChargeRule struct {
