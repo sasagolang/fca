@@ -45,7 +45,7 @@ func (logic LogicBase) GetMyChargeOrders(uid int) *[]model.ChargeOrder {
 }
 func (logic LogicBase) GetKFOrders() *[]model.ChargeOrder {
 	var charges []model.ChargeOrder
-	dal.DB.Where("Status=? ", 1).Find(&charges)
+	dal.DB.Where("Status=? ", 2).Find(&charges)
 	return &charges
 }
 func (logic LogicBase) KF() {

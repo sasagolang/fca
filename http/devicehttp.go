@@ -60,23 +60,9 @@ func EndChargeFunc(w rest.ResponseWriter, r *rest.Request) {
 	no, _ := strconv.ParseInt(r.PathParam("no"), 10, 64)
 	fmt.Printf("EndChargeFunc:%v,%v,%s", uid, no, r.PathParam("no"))
 	pole := Logic.GetChargeOrderByNo(no)
-	if pole != nil && len(pole.UUID) > 0 && pole.Status < 2 {
-		response, err := http.Get(fmt.Sprintf("%s/stop/%s", DeviceUrl, pole.UUID))
-		if response != nil {
-			defer response.Body.Close()
-		}
-		if err == nil && response != nil {
-
-			body, _ := ioutil.ReadAll(response.Body)
-			var result Result
-			json.Unmarshal(body, &result)
-			//	Logic.EndCharge(pole.UUID)
-			Logic.EndChargeOrderno(pole.UUID, no)
-			WriterResponse(w, result.ResultCode, result.ResultMessage, nil)
-
-		} else {
-			WriterResponse(w, 3, err.Error(), nil)
-		}
+	if pole != nil && len(pole.UUID) > 0 && pole.Status == 1 {
+		code, msg := Logic.EndChargeTCP(pole.UUID, no)
+		WriterResponse(w, code, msg, nil)
 	} else {
 		WriterResponse(w, 2, "充电桩不存在", nil)
 	}
