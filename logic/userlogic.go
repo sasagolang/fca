@@ -19,7 +19,10 @@ func (logic LogicBase) UserLogin(username string, pwd string, code string, login
 	if dal.DB.Preload("CarSet").Preload("CarSet.CarBrand").Where("mobile=?", username).First(&u).RecordNotFound() {
 		return nil, errors.New("用户不存在")
 	}
-	if !strings.EqualFold(u.Password, pwd) {
+	data, _ := libs.AesEncrypt([]byte(pwd), []byte(Aeskey))
+	pwdstr := base64.StdEncoding.EncodeToString(data)
+	if !strings.EqualFold(u.Password, pwdstr) {
+		fmt.Printf("%s,%s", u.Password)
 		return nil, errors.New("用户名或者密码错误")
 	}
 

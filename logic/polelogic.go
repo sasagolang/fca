@@ -28,6 +28,9 @@ func (logic LogicBase) UpdateCharge(uuid, chargeState string, energy int32, amou
 
 	var cs model.ChargeOrder
 	if !dal.DB.Where("UUID=?", uuid).Last(&cs).RecordNotFound() {
+		if cs.Status >= 2 {
+			return
+		}
 		wallet, _ := logic.MyWallet(cs.UID)
 
 		var statusname string
@@ -55,6 +58,7 @@ func (logic LogicBase) UpdateCharge(uuid, chargeState string, energy int32, amou
 				status = 2
 			}
 		}
+		fmt.Println("UpdateCharge:%v\n", cs)
 		if cs.Status == 2 {
 			statusname = cs.StatusName
 		}
@@ -71,7 +75,9 @@ func (logic LogicBase) EndCharge(uuid string) {
 
 	var cs model.ChargeOrder
 	if !dal.DB.Where("UUID=?", uuid).Last(&cs).RecordNotFound() {
-		dal.DB.Model(&cs).Updates(map[string]interface{}{"Status": 2, "StatusName": "待扣费"})
+		if cs.Status < 2 {
+			dal.DB.Model(&cs).Updates(map[string]interface{}{"Status": 2, "StatusName": "待扣费"})
+		}
 	}
 
 }
@@ -79,7 +85,9 @@ func (logic LogicBase) EndChargeOrdernoAndStatus(uuid string, orderno int64, sta
 
 	var cs model.ChargeOrder
 	if !dal.DB.Where("UUID=? and no=?", uuid, orderno).Last(&cs).RecordNotFound() {
-		dal.DB.Model(&cs).Updates(map[string]interface{}{"Status": status, "StatusName": "待扣费"})
+		if cs.Status < 2 {
+			dal.DB.Model(&cs).Updates(map[string]interface{}{"Status": status, "StatusName": "待扣费"})
+		}
 	}
 
 }
