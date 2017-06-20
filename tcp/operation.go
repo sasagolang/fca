@@ -27,6 +27,21 @@ func InBucket(ch *Channel) {
 	b.Put(ch.UUID, ch)
 	//	fmt.Printf("Bukets_2:%v\n", Bukets)
 }
+func DelChannelFromBucket(ch *Channel) {
+	var (
+		b  *Bucket
+		ok bool
+	)
+	cBuketsLock.Lock()
+	defer cBuketsLock.Unlock()
+	fmt.Printf("InBucket.epname:%v,%v\n", ch.EPName, Bukets[ch.EPName])
+	if b, ok = Bukets[ch.EPName]; ok {
+
+		b.Del(ch.UUID)
+
+	}
+
+}
 func GetChannelByUUID(uuid string) *Channel {
 
 	pole := Logic.GetPole(uuid)

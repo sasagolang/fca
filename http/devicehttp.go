@@ -4,10 +4,10 @@ import (
 	"io/ioutil"
 	"strconv"
 
+	"encoding/json"
 	"fmt"
 	"net/http"
-
-	"encoding/json"
+	"time"
 
 	"github.com/ant0ine/go-json-rest/rest"
 )
@@ -123,6 +123,14 @@ func GetChargeStatusFunc(w rest.ResponseWriter, r *rest.Request) {
 	no, _ := strconv.ParseInt(r.PathParam("orderno"), 10, 64)
 	//no, _ := strconv.pa(r.PathParam("orderno"))
 	cs := Logic.GetChargeStatus(uid, no)
+	ts := time.Now().Add(-2 * time.Minute).Unix()
+
+	if cs.Status == 0 && cs.StartTime < ts {
+		cs.StatusName = "开始充电失败"
+	}
+	if cs.Status == 1 && cs.EndTime > 0 && cs.EndTime < ts {
+		cs.StatusName = "停止充电失败"
+	}
 	WriterResponse(w, 1, "", cs)
 	fmt.Printf("GetChargeStatusFunc:%v,%v", uid, no)
 }
@@ -139,5 +147,9 @@ func GetLastChargeFunc(w rest.ResponseWriter, r *rest.Request) {
 
 	//no, _ := strconv.pa(r.PathParam("orderno"))
 	cs := Logic.GetLastCharge(uid)
+	if cs != nil && cs.ID <= 0 {
+		WriterResponse(w, 1, "", "")
+		return
+	}
 	WriterResponse(w, 1, "", cs)
 }

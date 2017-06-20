@@ -3,12 +3,12 @@ package main
 import (
 	"fca/libs"
 	"fca/libs/bufio"
-	"strconv"
-
 	"fca/libs/bytes"
 	"fmt"
 	"net"
+	"strconv"
 	"sync"
+	"time"
 )
 
 var cbLock sync.RWMutex
@@ -71,15 +71,15 @@ func acceptTCP(lis *net.TCPListener) {
 }
 
 func serveTCP(conn *net.TCPConn, r int) {
-	defer func() { // 必须要先声明defer，否则不能捕获到panic异常
+	// defer func() { // 必须要先声明defer，否则不能捕获到panic异常
 
-		if err := recover(); err != nil {
+	// 	if err := recover(); err != nil {
 
-			fmt.Println(err) // 这里的err其实就是panic传入的内容，55
-			return
-		}
+	// 		fmt.Println(err) // 这里的err其实就是panic传入的内容，55
+	// 		return
+	// 	}
 
-	}()
+	// }()
 
 	var ch = NewChannel("")
 	ch.Reader = bufio.Reader{}
@@ -94,7 +94,10 @@ func serveTCP(conn *net.TCPConn, r int) {
 
 	ch.Reader.ResetBuffer(conn, rb.Bytes())
 	ch.Writer.ResetBuffer(conn, wb.Bytes())
-	re := p.ReadTCP(rr)
+	re, err := p.ReadTCP(rr)
+	if err != nil {
+		return
+	}
 	//添加到buket
 	//fmt.Printf("serveTCP:%v\n", re)
 	ch.UUID = re.UDID
@@ -113,14 +116,28 @@ func serveTCP(conn *net.TCPConn, r int) {
 		bucket.Put(ch.UUID,ch)
 	}
 	cbLock.Unlock()*/
+	trd := time.AfterFunc(60*2*time.Second, func() {
+		conn.Close()
+	})
 	InBucket(ch)
 	go dispatchTCP(ch, rr, wr)
 	for {
 		//var p1 = &libs.Proto{}
-		p1 := p.ReadTCP(rr)
+		p1, err := p.ReadTCP(rr)
+		if err != nil {
+			break
+		}
 		Logic.ReceivedMsg(p1, ch.signal)
+		trd.Reset(60 * 1 * time.Second)
 		//	fmt.Printf("serveTCP:%v\n", p1)
 	}
+	fmt.Printf("DelChannelFromBucket:%v\n", ch.UUID)
+	DelChannelFromBucket(ch)
+	pole1 := Logic.GetPole(ch.UUID)
+	if pole1 != nil && pole1.Status == 2002 {
+		Logic.UpdateCharge(ch.UUID, "101", 0, 0, 0)
+	}
+	Logic.UpdatePoleStatus(ch.UUID, 3000, "设备已断网")
 }
 func dispatchTCP(ch *Channel, rr *bufio.Reader, wr *bufio.Writer) {
 	for {

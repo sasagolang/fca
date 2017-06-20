@@ -19,6 +19,7 @@ func (logic LogicBase) GetPole(uuid string) *model.Pole {
 func (logic LogicBase) UpdatePoleStatus(uuid string, status int32, statusName string) {
 	var pole model.Pole
 	if !dal.DB.Where("UUID=? ", uuid).Last(&pole).RecordNotFound() {
+
 		dal.DB.Model(&pole).Updates(map[string]interface{}{"Status": status, "StatusName": statusName})
 	}
 
@@ -40,14 +41,29 @@ func (logic LogicBase) UpdateCharge(uuid, chargeState string, energy int32, amou
 			switch chargeState {
 			case "0":
 				statusname = "充电异常"
+				status = 2
 			case "1":
 				statusname = "充电中"
 			case "2":
 				statusname = "已充满,待扣费"
 				status = 2
+			case "101":
+				statusname = "设备断网"
+				status = 2
+			case "102":
+				statusname = "充电结束"
+				status = 2
 			}
 		}
-		dal.DB.Model(&cs).Updates(map[string]interface{}{"State": chargeState, "Status": status, "StatusName": statusname, "Duration": duration, "Energy": energy, "Amount": amount})
+		if cs.Status == 2 {
+			statusname = cs.StatusName
+		}
+		if chargeState != "101" && chargeState != "102" {
+			dal.DB.Model(&cs).Updates(map[string]interface{}{"State": chargeState, "Status": status, "StatusName": statusname, "Duration": duration, "Energy": energy, "Amount": amount})
+		} else {
+			dal.DB.Model(&cs).Updates(map[string]interface{}{"State": chargeState, "Status": status, "StatusName": statusname})
+
+		}
 	}
 
 }
@@ -59,11 +75,11 @@ func (logic LogicBase) EndCharge(uuid string) {
 	}
 
 }
-func (logic LogicBase) EndChargeOrderno(uuid string, orderno int64) {
+func (logic LogicBase) EndChargeOrdernoAndStatus(uuid string, orderno int64, status int) {
 
 	var cs model.ChargeOrder
 	if !dal.DB.Where("UUID=? and no=?", uuid, orderno).Last(&cs).RecordNotFound() {
-		dal.DB.Model(&cs).Updates(map[string]interface{}{"Status": 2, "StatusName": "待扣费"})
+		dal.DB.Model(&cs).Updates(map[string]interface{}{"Status": status, "StatusName": "待扣费"})
 	}
 
 }
@@ -86,6 +102,13 @@ type ResultHttp struct {
 }
 
 func (logic LogicBase) EndChargeTCP(uuid string, orderno int64) (resultCode int, err1 string) {
+
+	corder := logic.GetLastChargeByUUID(uuid)
+	if corder != nil && corder.NO != orderno {
+		logic.EndChargeOrdernoAndStatus(uuid, orderno, 2)
+		return 1, ""
+	}
+	logic.EndChargeOrdernoAndStatus(uuid, orderno, 1)
 	response, err := http.Get(fmt.Sprintf("%s/stop/%s", DeviceUrl, uuid))
 	if response != nil {
 		defer response.Body.Close()
@@ -96,7 +119,7 @@ func (logic LogicBase) EndChargeTCP(uuid string, orderno int64) (resultCode int,
 		var result ResultHttp
 		json.Unmarshal(body, &result)
 		//	Logic.EndCharge(pole.UUID)
-		logic.EndChargeOrderno(uuid, orderno)
+
 		resultCode = result.ResultCode
 		err1 = result.ResultMessage
 		return

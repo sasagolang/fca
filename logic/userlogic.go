@@ -7,6 +7,7 @@ import (
 	"fca/libs"
 	"fca/model"
 	"fmt"
+	"strings"
 	"time"
 )
 
@@ -17,6 +18,9 @@ func (logic LogicBase) UserLogin(username string, pwd string, code string, login
 
 	if dal.DB.Preload("CarSet").Preload("CarSet.CarBrand").Where("mobile=?", username).First(&u).RecordNotFound() {
 		return nil, errors.New("用户不存在")
+	}
+	if !strings.EqualFold(u.Password, pwd) {
+		return nil, errors.New("用户名或者密码错误")
 	}
 
 	return u, nil

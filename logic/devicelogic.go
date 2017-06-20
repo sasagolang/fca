@@ -48,10 +48,13 @@ func (logic LogicBase) ReceivedMsg(p *libs.Proto, ch chan *libs.Proto) {
 
 			case 6:
 				statusname = "充电结束"
+				//停止充电订单
+				logic.UpdateCharge(p.UDID, "102", 0, 0, 0)
 			default:
 				statusname = "未知"
 			}
-			logic.UpdatePoleStatus(p.UDID, int32(v.GetMode()*2000), statusname)
+			logic.UpdatePoleStatus(p.UDID, int32(v.GetMode()+2000), statusname)
+
 		}
 		//Start_cmd(1, time.Now().Add(10*time.Minute), ch)
 	case 8: // 设备属性配置数据

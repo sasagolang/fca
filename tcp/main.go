@@ -25,7 +25,7 @@ func main() {
 	Logic = logic.LogicBase{}
 	dal.InitDb()
 	logic.InitLogic()
-	go KFRoutine()
+	//go KFRoutine()
 	go InitHttp()
 	/*
 		b, _ := base64.StdEncoding.DecodeString(s)

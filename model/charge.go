@@ -6,6 +6,7 @@ type ChargeOrder struct {
 	gorm.Model
 	NO         int64
 	UUID       string
+	PoleNO     int
 	UID        int
 	Amount     float32
 	Duration   int

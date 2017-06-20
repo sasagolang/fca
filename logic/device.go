@@ -54,7 +54,7 @@ func (d *DeviceProto) Parse() (data interface{}, err error) {
 	if d.CMD == 1 {
 		var data proto.HANDSHAKE_UP
 		protobuf.Unmarshal(d.Content, &data)
-		fmt.Printf("ContentParse:%v", &data)
+		//fmt.Printf("ContentParse:%v", &data)
 		libs.Log.Infof("ContentParse:%v", &data)
 		return &data, nil
 	}

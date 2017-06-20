@@ -21,12 +21,12 @@ type Proto struct {
 	CRC       uint16
 }
 
-func (p *Proto) ReadTCP(rr *bufio.Reader) (re *Proto) {
+func (p *Proto) ReadTCP(rr *bufio.Reader) (re *Proto, err error) {
 	re = &Proto{}
 	var buf []byte
-	var err error
+
 	if buf, err = rr.Pop(30); err != nil {
-		panic(err)
+
 		return
 	}
 
@@ -59,12 +59,12 @@ func (p *Proto) ReadTCP(rr *bufio.Reader) (re *Proto) {
 		return
 	}
 	if err != nil {
-		panic(err)
+		return
 	}
 	re.CRC = binary.BigEndian.Uint16(crcb)
 	//	fmt.Printf("ReadTCP.p:%v\n", re)
 	//binary.Read(rr, binary.BigEndian, p.CRC)
-	return re
+	return
 }
 
 var XX byte = 'H'
@@ -93,7 +93,7 @@ func (p *Proto) WriteTo(b *bufio.Writer) {
 	crc := Crc16(b1.Bytes())
 	binary.Write(b1, binary.BigEndian, crc)
 	_, err := b.Write(b1.Bytes())
-	fmt.Printf("WriteTo:%v\n", *p)
+	fmt.Printf("WriteTo:%v\n", p.CMD)
 	if err != nil {
 		fmt.Printf("WriteTo.error:%v\n", err)
 	}

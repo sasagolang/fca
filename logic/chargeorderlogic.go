@@ -3,6 +3,7 @@ package logic
 import (
 	"fca/dal"
 	"fca/model"
+	"strconv"
 	"time"
 
 	"github.com/jinzhu/gorm"
@@ -22,7 +23,8 @@ func (logic LogicBase) CreateChargeOrder(uid int, no int, uuid, epname, epaddres
 	order.EPName = epname
 	order.EPAddress = epaddres
 	order.StartTime = time.Now().Unix()
-	order.StatusName = "充电中"
+	order.StatusName = "准备充电中"
+	order.PoleNO = no
 	dal.DB.NewRecord(order)
 	dal.DB.Create(&order)
 
@@ -33,14 +35,19 @@ func (logic LogicBase) GetChargeStatus(uid int, no int64) *model.ChargeOrder {
 	dal.DB.Where("UID = ? and no=?", uid, no).First(&charge)
 	return &charge
 }
+func (logic LogicBase) GetLastChargeByUUID(uuid string) *model.ChargeOrder {
+	var charge model.ChargeOrder
+	dal.DB.Where("UUID = ? ", uuid).Last(&charge)
+	return &charge
+}
 func (logic LogicBase) GetLastCharge(uid int) *model.ChargeOrder {
 	var charge model.ChargeOrder
-	dal.DB.Where("UID = ? and Status=?", uid, 0).First(&charge)
+	dal.DB.Where("UID = ? and Status=?", uid, 1).Last(&charge)
 	return &charge
 }
 func (logic LogicBase) GetMyChargeOrders(uid int) *[]model.ChargeOrder {
 	var charges []model.ChargeOrder
-	dal.DB.Where("UID = ? ", uid).Find(&charges)
+	dal.DB.Where("UID = ? and Status>? ", uid, 0).Order("id desc").Find(&charges)
 	return &charges
 }
 func (logic LogicBase) GetKFOrders() *[]model.ChargeOrder {
@@ -56,8 +63,14 @@ func (logic LogicBase) KF() {
 			var myWallet model.MyWallet
 			var order model.ChargeOrder
 			if !dal.DB.Where("uid=?", v.UID).First(&myWallet).RecordNotFound() {
-				dal.DB.Model(&myWallet).Update("Balance", gorm.Expr("Balance - ?", v.Amount))
-				dal.DB.Model(&order).Where("ID = ?", v.ID).Updates(map[string]interface{}{"Status": 3, "StatusName": "扣款完成"})
+				dal.DB.Model(&myWallet).Update("Balance", gorm.Expr("Balance - ?", v.Amount*100))
+				dal.DB.Model(&order).Where("ID = ?", v.ID).Updates(map[string]interface{}{"Status": 3, "StatusName": v.StatusName + ",扣款完成"})
+				walletLog := new(model.MyWalletLog)
+				walletLog.UID = v.UID
+				walletLog.Type = "充电"
+				walletLog.Info = "充电:" + strconv.FormatFloat(float64(v.Amount), 'f', -4, 32) + "订单号：" + strconv.FormatInt(v.NO, 10) + "日期：" + time.Now().Format("2006-01-02 15:04:05")
+				dal.DB.NewRecord(walletLog)
+				dal.DB.Create(walletLog)
 			}
 
 			tx.Commit()
