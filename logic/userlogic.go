@@ -16,6 +16,10 @@ var Aeskey = "qwerasdfzxcvtgbyhn567890123456bh"
 func (logic LogicBase) UserLogin(username string, pwd string, code string, loginType int) (user *model.User, err error) {
 	u := new(model.User)
 
+	err = logic.CheckCodeByMobile(username, code)
+	if err != nil {
+		return nil, err
+	}
 	if dal.DB.Preload("CarSet").Preload("CarSet.CarBrand").Where("mobile=?", username).First(&u).RecordNotFound() {
 		return nil, errors.New("用户不存在")
 	}
@@ -33,7 +37,12 @@ func (logic LogicBase) RegisterUser(mobile string, email string, cname string, p
 	user := new(model.User)
 
 	if !dal.DB.Where("mobile=?", mobile).First(&user).RecordNotFound() {
-		return nil, errors.New("用户已注册")
+		//用户已注册，直接修改密码
+		data, _ := libs.AesEncrypt([]byte(pwd), []byte(Aeskey))
+		pwdstr := base64.StdEncoding.EncodeToString(data)
+
+		dal.DB.Model(&user).Updates(map[string]interface{}{"Password": pwdstr})
+		return user, nil
 	}
 
 	user.UID = time.Now().Nanosecond()
@@ -96,4 +105,10 @@ func (logic LogicBase) UpdateUserInfo(uid int, nickName string, headImg string, 
 		dal.DB.Model(&user).Updates(u)
 	}
 	return nil
+}
+func (logic LogicBase) ForgetPwd(mobile, code, pwd string) (err error) {
+	err = logic.CheckCodeByMobile(username, code)
+	if err != nil {
+		return err
+	}
 }

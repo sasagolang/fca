@@ -79,6 +79,11 @@ func RegisterByMobile(w rest.ResponseWriter, r *rest.Request) {
 		WriterResponse(w, 2, err.Error(), err)
 		return
 	}
+	err = Logic.CheckCodeByMobile(reg.Mobile, reg.VerifyCode)
+	if err != nil {
+		WriterResponse(w, 3, err.Error(), err)
+		return
+	}
 	u, err := Logic.RegisterUser(reg.Mobile, "", "anonymous", reg.Pwd)
 	if err != nil {
 		WriterResponse(w, 2, err.Error(), err)
