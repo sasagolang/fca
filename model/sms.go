@@ -5,7 +5,7 @@ import "time"
 
 type SMSInfo struct {
 	gorm.Model
-	UID      int
+	UID      int `gorm:"column:uid;"`
 	Mobile   string
 	Code     string
 	SendTime time.Time

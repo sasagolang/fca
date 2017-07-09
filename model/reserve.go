@@ -6,7 +6,7 @@ type Reserve struct {
 	gorm.Model
 	User           User
 	UserID         uint
-	UID            int
+	UID            int `gorm:"column:uid;"`
 	StartTime      int64
 	EndTime        int64
 	Status         uint
@@ -22,7 +22,7 @@ type CreateReserveRequest struct {
 
 type MyReserveResponse struct {
 	UserID    uint
-	UID       int
+	UID       int `gorm:"column:uid;"`
 	StartTime int64
 	EndTime   int64
 	Status    uint

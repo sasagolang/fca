@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"fca/libs"
 	"fca/logic"
 
 	"github.com/ant0ine/go-json-rest/rest"
@@ -97,9 +98,12 @@ func Init() {
 		selfHandler(aliResult)
 	})
 	//InitAuth()
-	go log.Fatal(http.ListenAndServe(":8999", nil))
-	//err1 := http.ListenAndServeTLS(":443", "214079740930545.pem", "214079740930545.key", nil)
-	//fmt.Printf("err1:%v\n", err1)
+	if libs.Debug {
+		go log.Fatal(http.ListenAndServe(":8999", nil))
+	} else {
+		err1 := http.ListenAndServeTLS(":443", "214079740930545.pem", "214079740930545.key", nil)
+		fmt.Printf("err1:%v\n", err1)
+	}
 
 	/*	router := httprouter.New()
 		router.GET("/", Index)

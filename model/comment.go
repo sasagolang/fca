@@ -6,7 +6,7 @@ type Comment struct {
 	gorm.Model
 	User           User
 	UserID         uint
-	UID            int
+	UID            int `gorm:"column:uid;"`
 	Status         uint
 	ElectricPile   ElectricPile
 	ElectricPileID uint
@@ -20,7 +20,7 @@ type CreateCommentRequest struct {
 	Title          string
 }
 type GetCommentResponse struct {
-	UID        int
+	UID        int `gorm:"column:uid;"`
 	Name       string
 	NickName   string
 	HeadImg    string

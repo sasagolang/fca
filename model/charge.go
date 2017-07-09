@@ -7,7 +7,7 @@ type ChargeOrder struct {
 	NO         int64
 	UUID       string
 	PoleNO     int
-	UID        int
+	UID        int `gorm:"column:uid;"`
 	Amount     float32
 	Duration   int
 	State      string

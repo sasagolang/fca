@@ -4,7 +4,7 @@ import "github.com/jinzhu/gorm"
 
 type User struct {
 	gorm.Model
-	UID          int
+	UID          int `gorm:"column:uid;"`
 	Name         string
 	Email        string
 	Password     string
@@ -33,7 +33,7 @@ type RegisterUserRequest struct {
 	Pwd        string
 }
 type UpdateUserInfoRequest struct {
-	UID      int
+	UID      int 
 	NickName string
 	HeadImg  string
 	Password string

@@ -162,7 +162,7 @@ $(function () {
  
     //
     $("#submit").click(function() {
-        alert("fdfdfdf");
+        
         $("#loginform").submit();
     });
 });

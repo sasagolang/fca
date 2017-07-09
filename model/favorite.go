@@ -6,5 +6,5 @@ type Favorite struct {
 	gorm.Model
 	ElectricPile   ElectricPile
 	ElectricPileID uint
-	UID            int
+	UID            int `gorm:"column:uid;"`
 }

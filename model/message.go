@@ -4,7 +4,7 @@ import "github.com/jinzhu/gorm"
 
 type Message struct {
 	gorm.Model
-	UID        int
+	UID        int `gorm:"column:uid;"`
 	Title      string
 	Content    string
 	Status     int
