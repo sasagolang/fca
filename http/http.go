@@ -84,6 +84,8 @@ func Init() {
 	http.Handle("/api/", http.StripPrefix("/api", api.MakeHandler()))
 	http.Handle("/static/", http.StripPrefix("/static", http.FileServer(http.Dir("."))))
 	http.HandleFunc("/verifyimg", GetVerifyImg)
+	http.HandleFunc("/admin/login", ExecuteHttp)
+	http.HandleFunc("/admin/loginpost", LoginPost)
 	Admin.MountTo("/admin", http.DefaultServeMux)
 	http.HandleFunc("/callback/aliappcallback", func(w http.ResponseWriter, r *http.Request) {
 		aliResult, err := AliAppCallback(w, r)
@@ -94,10 +96,10 @@ func Init() {
 		}
 		selfHandler(aliResult)
 	})
-	InitAuth()
-	//go log.Fatal(http.ListenAndServe(":8999", nil))
-	err1 := http.ListenAndServeTLS(":443", "214079740930545.pem", "214079740930545.key", nil)
-	fmt.Printf("err1:%v\n", err1)
+	//InitAuth()
+	go log.Fatal(http.ListenAndServe(":8999", nil))
+	//err1 := http.ListenAndServeTLS(":443", "214079740930545.pem", "214079740930545.key", nil)
+	//fmt.Printf("err1:%v\n", err1)
 
 	/*	router := httprouter.New()
 		router.GET("/", Index)

@@ -16,10 +16,10 @@ var Aeskey = "qwerasdfzxcvtgbyhn567890123456bh"
 func (logic LogicBase) UserLogin(username string, pwd string, code string, loginType int) (user *model.User, err error) {
 	u := new(model.User)
 
-	err = logic.CheckCodeByMobile(username, code)
-	if err != nil {
-		return nil, err
-	}
+	//	err = logic.CheckCodeByMobile(username, code)
+	//if err != nil {
+	//	return nil, err
+	//}
 	if dal.DB.Preload("CarSet").Preload("CarSet.CarBrand").Where("mobile=?", username).First(&u).RecordNotFound() {
 		return nil, errors.New("用户不存在")
 	}
@@ -107,8 +107,9 @@ func (logic LogicBase) UpdateUserInfo(uid int, nickName string, headImg string, 
 	return nil
 }
 func (logic LogicBase) ForgetPwd(mobile, code, pwd string) (err error) {
-	err = logic.CheckCodeByMobile(username, code)
+	err = logic.CheckCodeByMobile(mobile, code)
 	if err != nil {
 		return err
 	}
+	return nil
 }

@@ -28,7 +28,7 @@ func AuthView(w http.ResponseWriter, r *http.Request) {
 
 }
 func (Auth) LoginURL(c *admin.Context) string {
-	return "/auth/login"
+	return "/admin/login"
 }
 
 func (Auth) LogoutURL(c *admin.Context) string {
@@ -36,7 +36,7 @@ func (Auth) LogoutURL(c *admin.Context) string {
 }
 
 func (Auth) GetCurrentUser(c *admin.Context) qor.CurrentUser {
-	if userid, err := c.Request.Cookie("userid"); err == nil || true {
+	if userid, err := c.Request.Cookie("fcauid"); err == nil {
 		//var user  auth
 		user := AdminUser{}
 		user.Name = userid.Value

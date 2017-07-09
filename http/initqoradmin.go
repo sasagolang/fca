@@ -54,5 +54,5 @@ func InitQorAdmin() {
 	Admin.AddResource(&model.Comment{})
 	Admin.AddResource(&model.ChargeOrder{})
 	Admin.AddResource(&model.Message{})
-	//Admin.SetAuth(&Auth{})
+	Admin.SetAuth(&Auth{})
 }

@@ -6,9 +6,9 @@ type BaseConfig struct {
 	gorm.Model
 	CompanyName      string
 	CopyRight        string
-	FeeDescription   string
+	FeeDescription   string `gorm:"size:8000"`
 	ServicePhone     string
 	QQ               string
 	SiteName         string
-	RegisterProtocol string `gorm:"size:4000"`
+	RegisterProtocol string `gorm:"size:8000"`
 }

@@ -12,18 +12,19 @@ import (
 	"net/url"
 	"time"
 )
-func (logic LogicBase) CheckCodeByMobile(mobile string, code string)(err error){
+
+func (logic LogicBase) CheckCodeByMobile(mobile string, code string) (err error) {
 	var smsinfo model.SMSInfo
-		if !dal.DB.Where("mobile=?", mobile).Last(&smsinfo).RecordNotFound() {
+	if !dal.DB.Where("mobile=?", mobile).Last(&smsinfo).RecordNotFound() {
 		if time.Now().Sub(smsinfo.SendTime).Minutes() > 60*24 {
 			return errors.New("验证码错误(001)！")
 		}
-		if smsinfo.Code!=code{
+		if smsinfo.Code != code {
 			return errors.New("验证码错误(003)！")
 		}
-	}else{
-	return errors.New("验证码错误(002)！")
-		}
+	} else {
+		return errors.New("验证码错误(002)！")
+
 	}
 	return nil
 }
