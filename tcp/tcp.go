@@ -106,7 +106,12 @@ func serveTCP(conn *net.TCPConn, r int) {
 	ch.UDType = re.UDType
 	fmt.Printf("链接:%v\n", ch.UUID)
 	pole := Logic.GetPole(ch.UUID)
+	if pole == nil || pole.ID == 0 {
+		conn.Close()
+		return
+	}
 	ch.EPName = strconv.Itoa(int(pole.ElectricPile.ID))
+
 	/*cbLock.Lock()
 	if bucket,ok:=Bukets[strconv.Itoa( int(pole.ElectricPile.ID))];ok{
 		bucket.Put(ch.UUID,ch)

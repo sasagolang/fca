@@ -24,11 +24,27 @@ func AliAppPay(uid int, paymentAmout int64) string {
 	charge.MoneyFee = order.PaymentAmount
 	charge.Describe = "充值"
 	charge.TradeNum = strconv.FormatInt(order.OrderNo, 10)
-	charge.CallbackURL = "http://218.17.28.42:8999/callback/aliappcallback"
+	charge.CallbackURL = "https://appgphitec.com/callback/aliappcallback"
 	fmt.Printf("tradnum:%v,AliAppPay:%v\n", string(order.OrderNo), charge)
 	fdata, err := logic.Pay(charge)
 	if err != nil {
 		fmt.Printf("AliAppPay:%v\n", err)
+	}
+	return fdata
+}
+func WeChatAppPay(uid int, paymentAmout int64) string {
+	//Create Order
+	order := Logic.CreateOrder(uid, paymentAmout, "WeChatApp")
+	charge := new(common.Charge)
+	charge.PayMethod = constant.WECHAT
+	charge.MoneyFee = order.PaymentAmount
+	charge.Describe = "充值"
+	charge.TradeNum = strconv.FormatInt(order.OrderNo, 10)
+	charge.CallbackURL = "https://appgphitec.com/callback/wechatappcallback"
+	fmt.Printf("tradnum:%v,WeChatAppPay:%v\n", string(order.OrderNo), charge)
+	fdata, err := logic.Pay(charge)
+	if err != nil {
+		fmt.Printf("WeChatAppPay:%v\n", err)
 	}
 	return fdata
 }
@@ -47,16 +63,27 @@ func TestPay() {
 	}
 	fmt.Println(fdata)
 }
+
+//2017031306200530
 func InitClient() {
 	ali := &client.AliAppClient{
-		PartnerID:  "2088102169368862",
+		PartnerID:  "2088521469262911",
 		SellerID:   "xuyanmei@glelec.com",
-		AppID:      "2017010804929917",
+		AppID:      "2017031306200530",
 		PrivateKey: nil,
 		PublicKey:  nil,
 	}
 	client.InitAliAppClient(ali)
 	InitKeys(ali)
+
+	wechatapp := &client.WechatAppClient{
+		AppID: "wx02e17b72574934e7",
+		MchID: "1487065122",
+
+		Key:    "ec76f5c7377e3291603216b1de793539",
+		PayURL: "https://api.mch.weixin.qq.com/pay/unifiedorder",
+	}
+	client.InitWechatClient(wechatapp)
 	//	fmt.Printf("initClient:%v\n", ali)
 }
 func InitKeys(c *client.AliAppClient) error {
@@ -91,17 +118,22 @@ func InitKeys(c *client.AliAppClient) error {
 	return err
 }
 func PayFunc(w rest.ResponseWriter, r *rest.Request) {
-	//payType := r.PathParam("PayType")
+	var rstr string
+	payType := r.PathParam("PayType")
 	uid, _ := strconv.Atoi(r.PathParam("uid"))
 	amount, _ := strconv.Atoi(r.PathParam("Amount"))
-	s := AliAppPay(uid, int64(amount))
+	if payType == "1" {
+		rstr = AliAppPay(uid, int64(amount))
+	} else if payType == "2" {
+		rstr = WeChatAppPay(uid, int64(amount))
+	}
 	var err error
 	if err != nil {
 		fmt.Printf("GetCarBrands error(%v)\n", err)
 		WriterResponse(w, 2, err.Error(), err)
 		return
 	}
-	WriterResponse(w, 1, "", s)
+	WriterResponse(w, 1, "", rstr)
 }
 
 /*func initHandle() {

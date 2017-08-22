@@ -1,11 +1,14 @@
 package http
 
 import (
+	"encoding/xml"
 	"errors"
 	"fca/libs"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/guidao/gopay/client"
@@ -92,6 +95,14 @@ func AliAppCallback(w http.ResponseWriter, r *http.Request) (*common.AliWebPayRe
 		return nil, err
 	}
 
+	f, err := strconv.ParseFloat(aliPay.TotalFee, 32)
+	f = f * 100
+	s := fmt.Sprintf("%.0f", f)
+	price, err := strconv.Atoi(s)
+	//price := (int)(f)
+	fmt.Printf("AliAppCallback:%s,%f,%d\n", aliPay.TotalFee, f, price)
+	orderno, err := strconv.ParseInt(aliPay.OutTradeNum, 10, 64)
+	Logic.DepositFunc(0, int64(price), "aliapp", orderno)
 	// err = biz.AliAppCallBack(&aliPay)
 	// if err != nil {
 	// 	//log.Error(err)
@@ -100,4 +111,63 @@ func AliAppCallback(w http.ResponseWriter, r *http.Request) (*common.AliWebPayRe
 
 	w.Write([]byte("success"))
 	return &aliPay, nil
+}
+func WechatAppCallback(w http.ResponseWriter, r *http.Request) (*common.WeChatPayResult, error) {
+	var returnCode = "FAIL"
+	var returnMsg = ""
+	defer func() {
+		formatStr := `<xml><return_code><![CDATA[%s]]></return_code>
+                  <return_msg>![CDATA[%s]]</return_msg></xml>`
+		returnBody := fmt.Sprintf(formatStr, returnCode, returnMsg)
+		w.Write([]byte(returnBody))
+	}()
+	var reXML common.WeChatPayResult
+	//body := cb.Ctx.Input.RequestBody
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		//log.Error(string(body))
+		returnCode = "FAIL"
+		returnMsg = "Bodyerror"
+		return nil, err
+	}
+	err = xml.Unmarshal(body, &reXML)
+	if err != nil {
+		//log.Error(err, string(body))
+		returnMsg = "参数错误"
+		returnCode = "FAIL"
+		return nil, err
+	}
+
+	if reXML.ReturnCode != "SUCCESS" {
+		//log.Error(reXML)
+		returnCode = "FAIL"
+		return &reXML, errors.New(reXML.ReturnCode)
+	}
+	m, err := util.XmlToMap(body)
+	if err != nil {
+		//log.Error(err, body)
+		returnMsg = "参数错误"
+		returnCode = "FAIL"
+		return nil, err
+	}
+	//log.Info(m)
+	var signData []string
+	for k, v := range m {
+		if k == "sign" {
+			continue
+		}
+		signData = append(signData, fmt.Sprintf("%v=%v", k, v))
+	}
+	sort.Strings(signData)
+	signData2 := strings.Join(signData, "&")
+	err = client.DefaultWechatAppClient().CheckSign(signData2, m["sign"])
+	if err != nil {
+		returnCode = "FAIL"
+		return nil, err
+	}
+	fmt.Printf("WechatAppCallback:%v\n", reXML)
+	orderno, err := strconv.ParseInt(reXML.OutTradeNO, 10, 64)
+	Logic.DepositFunc(0, int64(reXML.TotalFee), "WechatApp", orderno)
+	returnCode = "SUCCESS"
+	return &reXML, nil
 }

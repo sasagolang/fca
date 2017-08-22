@@ -13,6 +13,8 @@ func InitQorAdmin() {
 	Admin.SetSiteName("大源充电后台管理系统")
 	//, &admin.Config{Name: "客户信息", Link: "/User"}
 	Admin.AddResource(&model.User{}, &admin.Config{Name: "用户信息"})
+	//Admin.AddResource(&model.User{}, &admin.Config{Name: "用户信息"})
+	//return
 	//users.Name = "用户信息"
 	//users.Meta(&admin.Meta{Name: "用户信息"})
 	//Admin.AddMenu(&admin.Menu{Name: "客户信息", Link: "/admin/users"})
@@ -27,16 +29,16 @@ func InitQorAdmin() {
 	carSets.Meta(&admin.Meta{Name: "CarBrand", Config: &admin.SelectOneConfig{SelectMode: "select_async", RemoteDataResource: carBrands}})
 
 	//ElectricPile
-	epDirectTypes := Admin.AddResource(&model.EPDirectType{}, &admin.Config{Invisible: true})
-	epTypes := Admin.AddResource(&model.EPType{}, &admin.Config{Invisible: true})
+	epDirectTypes := Admin.AddResource(&model.EPDirectType{}, &admin.Config{Name: "站点标准"})
+	epTypes := Admin.AddResource(&model.EPType{}, &admin.Config{Name: "站点类型"})
 	electricPiles := Admin.AddResource(&model.ElectricPile{}, &admin.Config{Name: "站点信息"})
 	electricPiles.Meta(&admin.Meta{Name: "EPDirectType", Config: &admin.SelectOneConfig{SelectMode: "select_async", RemoteDataResource: epDirectTypes}})
 	electricPiles.Meta(&admin.Meta{Name: "EPType", Config: &admin.SelectOneConfig{SelectMode: "select_async", RemoteDataResource: epTypes}})
 
 	//订单
-	orders := Admin.AddResource(&model.Order{}, &admin.Config{Invisible: true})
-	if orders != nil {
-	}
+	//orders := Admin.AddResource(&model.Order{}, &admin.Config{Invisible: true})
+	//if orders != nil {
+	//}
 	//钱包
 	wallets := Admin.AddResource(&model.MyWallet{}, &admin.Config{Name: "钱包金额"})
 	if wallets != nil {

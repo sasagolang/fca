@@ -31,15 +31,16 @@ func (logic LogicBase) DepositFunc(uid int, depositAmout int64, fromSource strin
 	//var user *model.User
 	//dal.DB.Model(&order).Association("users").First(&user)
 
-	if dal.DB.Where("order_no=?", orderno).First(&order).RecordNotFound() {
+	if dal.DB.Preload("User").Where("order_no=? and state=''", orderno).First(&order).RecordNotFound() {
 
 	} else {
+		uid = order.User.UID
 		fmt.Printf("DepositFunc.&order:%v\n", &order)
 		var user model.User
 
 		dal.DB.First(&user, order.UserID)
 		fmt.Printf("DepositFunc.user:%v\n", &user)
-		if int(user.UID) != uid {
+		if false && int(user.UID) != uid {
 			fmt.Printf("DepositFunc.order1:%v\n", &order)
 		} else {
 			//order.SetState("已付款")

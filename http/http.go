@@ -97,6 +97,15 @@ func Init() {
 		}
 		selfHandler(aliResult)
 	})
+	http.HandleFunc("/callback/wechatappcallback", func(w http.ResponseWriter, r *http.Request) {
+		wechatResult, err := WechatAppCallback(w, r)
+		if err != nil {
+			fmt.Println(err)
+			//log.xxx
+			return
+		}
+		selfHandler(wechatResult)
+	})
 	//InitAuth()
 	if libs.Debug {
 		go log.Fatal(http.ListenAndServe(":8999", nil))
